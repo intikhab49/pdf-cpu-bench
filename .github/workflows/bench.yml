@@ -17,6 +17,8 @@ env:
   BENCH_REPO: allenai/olmOCR-bench
   BENCH_REV: 54a96a6fb6a2bd3b297e59869491db4d3625b711
   PYTHON_VERSION: "3.12"
+  # keeps pip's wheel cache out of the model-download measurement
+  PIP_NO_CACHE_DIR: "1"
 
 jobs:
   plan:
@@ -79,6 +81,10 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+      - name: Free disk (default installs pull CUDA torch)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
       - if: matrix.apt != ''
         run: sudo apt-get update -q && sudo apt-get install -y -q ${{ matrix.apt }}
       - name: Install ${{ matrix.pip }}
@@ -125,8 +131,36 @@ jobs:
           path: out
           retention-days: 30
 
+  speed:
+    needs: data
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/cache/restore@v4
+        with:
+          path: olmOCR-bench
+          key: olmocr-bench-${{ env.BENCH_REV }}
+          fail-on-cache-miss: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Free disk (default installs pull CUDA torch)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+      - run: sudo apt-get update -q && sudo apt-get install -y -q tesseract-ocr poppler-utils
+      - name: Every candidate on this one runner
+        run: bash bench/speed.sh olmOCR-bench/bench_data speed "${{ inputs.only }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: speed
+          path: speed
+          retention-days: 30
+
   score:
-    needs: convert
+    needs: [convert, speed]
     if: always()
     runs-on: ubuntu-24.04
     steps:
@@ -141,19 +175,25 @@ jobs:
           pattern: out-*
           path: out
           merge-multiple: true
+      - uses: actions/download-artifact@v5
+        continue-on-error: true
+        with:
+          name: speed
+          path: speed
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install the olmocr-bench checker
         run: |
-          pip install --quiet "olmocr[bench]==0.4.27"
+          # numpy is only in the elo extra but benchmark.py imports it
+          pip install --quiet "olmocr[bench,elo]==0.4.27"
           playwright install --with-deps chromium
       - name: Score
         run: |
           python bench/prepare_scoring.py --data olmOCR-bench/bench_data --out out
           python -m olmocr.bench.benchmark --dir olmOCR-bench/bench_data 2>&1 | tee out/olmocr-bench-score.txt
       - name: Summarize
-        run: python bench/summarize.py --out out | tee -a "$GITHUB_STEP_SUMMARY"
+        run: python bench/summarize.py --out out --speed speed | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: results
@@ -162,3 +202,5 @@ jobs:
             out/*.jsonl
             out/*.txt
             out/results.md
+            speed/*.json
+            speed/*.jsonl

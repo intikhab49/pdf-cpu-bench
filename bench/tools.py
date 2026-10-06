@@ -5,7 +5,9 @@ show what a user gets from `pip install` and the README example.
 """
 
 import pathlib
+import shutil
 import subprocess
+import sys
 import tempfile
 
 
@@ -36,7 +38,7 @@ def marker(mode):
     from marker.output import text_from_rendered
 
     # fast is marker's own default on CPU; fast-no-ocr is its "CPU-only / no VLM" recipe
-    config = {"mode": "fast", "disable_tqdm": True}
+    config = {"mode": "fast", "output_format": "markdown", "disable_tqdm": True}
     if mode == "fast-no-ocr":
         config["disable_ocr"] = True
     parser = ConfigParser(config)
@@ -65,12 +67,18 @@ def docling(mode):
 def mineru(mode):
     # MinerU 4's stateless CLI; tier "basic" is its ONNX, CPU-capable tier
     tier = mode if mode != "default" else "basic"
+    # the CLI lives in the tool's own venv, which is not on PATH
+    venv_bin = pathlib.Path(sys.executable).parent
+    exe = shutil.which("mineru-kit", path=str(venv_bin))
+    if exe is None:
+        found = sorted(p.name for p in venv_bin.iterdir() if "mineru" in p.name)
+        raise RuntimeError(f"no mineru-kit in {venv_bin}; mineru entry points there: {found}")
 
     def convert(path):
         with tempfile.TemporaryDirectory() as tmp:
             out = pathlib.Path(tmp) / "out.md"
             subprocess.run(
-                ["mineru-kit", "parse", path, "-o", str(out), "--tier", tier],
+                [exe, "parse", path, "-o", str(out), "--tier", tier],
                 check=True,
                 capture_output=True,
                 text=True,

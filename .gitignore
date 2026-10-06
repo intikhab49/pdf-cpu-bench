@@ -1,0 +1,4 @@
+out/
+olmOCR-bench/
+__pycache__/
+.venv/

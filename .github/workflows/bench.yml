@@ -1,0 +1,164 @@
+name: bench
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: PDFs per category (0 = the full 1,403)
+        default: "5"
+      only:
+        description: comma-separated candidate names, empty = all
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  BENCH_REPO: allenai/olmOCR-bench
+  BENCH_REV: 54a96a6fb6a2bd3b297e59869491db4d3625b711
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: plan
+        env:
+          LIMIT: ${{ inputs.limit }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, os
+          only = {s.strip() for s in os.environ["ONLY"].split(",") if s.strip()}
+          full = os.environ["LIMIT"] == "0"
+          rows = []
+          for c in json.load(open("bench/candidates.json")):
+              if only and c["name"] not in only:
+                  continue
+              shards = c["shards"] if full else 1
+              rows += [dict(c, shard=i, shards=shards, apt=c.get("apt", "")) for i in range(shards)]
+          print("matrix=" + json.dumps({"include": rows}))
+          EOF
+
+  data:
+    runs-on: ubuntu-24.04
+    steps:
+      - id: cache
+        uses: actions/cache@v4
+        with:
+          path: olmOCR-bench
+          key: olmocr-bench-${{ env.BENCH_REV }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          pip install --quiet huggingface_hub
+          python3 -c "from huggingface_hub import snapshot_download as d; d(repo_id='$BENCH_REPO', repo_type='dataset', revision='$BENCH_REV', local_dir='olmOCR-bench', allow_patterns=['bench_data/*.jsonl', 'bench_data/pdfs/**'])"
+          find olmOCR-bench/bench_data/pdfs -name '*.pdf' | wc -l
+
+  convert:
+    needs: [plan, data]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+    name: ${{ matrix.name }} (${{ matrix.shard }}/${{ matrix.shards }})
+    env:
+      XDG_CACHE_HOME: ${{ github.workspace }}/../model-cache
+      HF_HOME: ${{ github.workspace }}/../model-cache/huggingface
+      TORCH_HOME: ${{ github.workspace }}/../model-cache/torch
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/cache/restore@v4
+        with:
+          path: olmOCR-bench
+          key: olmocr-bench-${{ env.BENCH_REV }}
+          fail-on-cache-miss: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - if: matrix.apt != ''
+        run: sudo apt-get update -q && sudo apt-get install -y -q ${{ matrix.apt }}
+      - name: Install ${{ matrix.pip }}
+        run: |
+          python -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet --upgrade pip
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet "${{ matrix.pip }}"
+          # measured before our own helpers go in
+          du -sm "$RUNNER_TEMP/venv" | cut -f1 > install_mb.txt
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet psutil pypdf
+          "$RUNNER_TEMP/venv/bin/pip" freeze > freeze.txt
+          echo "venv: $(cat install_mb.txt) MB"
+      - name: Convert
+        run: |
+          mkdir -p out "$XDG_CACHE_HOME"
+          home_before=$(du -sm --exclude=work "$HOME" | cut -f1)
+          "$RUNNER_TEMP/venv/bin/python" bench/run.py \
+            --tool "${{ matrix.tool }}" --mode "${{ matrix.mode }}" --name "${{ matrix.name }}" \
+            --data olmOCR-bench/bench_data --out out \
+            --shard "${{ matrix.shard }}" --shards "${{ matrix.shards }}" --limit "${{ inputs.limit }}"
+          home_after=$(du -sm --exclude=work "$HOME" | cut -f1)
+          python3 - <<EOF
+          import json, os, re
+          freeze = open("freeze.txt").read()
+          json.dump({
+              "name": "${{ matrix.name }}", "shard": ${{ matrix.shard }},
+              "pip": "${{ matrix.pip }}",
+              "install_mb": int(open("install_mb.txt").read()),
+              "downloads_mb": int(os.popen("du -sm '$XDG_CACHE_HOME' | cut -f1").read()) + ($home_after - $home_before),
+              "cpu": re.search(r"model name\s*:\s*(.*)", open("/proc/cpuinfo").read()).group(1),
+              "nproc": os.cpu_count(),
+              "mem_gb": round(os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2**30, 1),
+              "packages": len(freeze.splitlines()),
+          }, open("out/${{ matrix.name }}.shard${{ matrix.shard }}.env.json", "w"), indent=2)
+          EOF
+          cp freeze.txt "out/${{ matrix.name }}.shard${{ matrix.shard }}.freeze.txt"
+          cat out/*.summary.json out/*.env.json
+          python3 -c "import json,collections; c=collections.Counter(json.loads(l)['status'].split(':')[0] for l in open('out/${{ matrix.name }}.shard${{ matrix.shard }}.pages.jsonl')); print(dict(c))"
+          grep -h '"status": "error' out/*.pages.jsonl | head -5 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: out-${{ matrix.name }}-${{ matrix.shard }}
+          path: out
+          retention-days: 30
+
+  score:
+    needs: convert
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/cache/restore@v4
+        with:
+          path: olmOCR-bench
+          key: olmocr-bench-${{ env.BENCH_REV }}
+          fail-on-cache-miss: true
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: out-*
+          path: out
+          merge-multiple: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install the olmocr-bench checker
+        run: |
+          pip install --quiet "olmocr[bench]==0.4.27"
+          playwright install --with-deps chromium
+      - name: Score
+        run: |
+          python bench/prepare_scoring.py --data olmOCR-bench/bench_data --out out
+          python -m olmocr.bench.benchmark --dir olmOCR-bench/bench_data 2>&1 | tee out/olmocr-bench-score.txt
+      - name: Summarize
+        run: python bench/summarize.py --out out | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: |
+            out/*.json
+            out/*.jsonl
+            out/*.txt
+            out/results.md

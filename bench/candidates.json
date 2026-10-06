@@ -1,0 +1,11 @@
+[
+  {"name": "markitdown",          "tool": "markitdown",   "mode": "default",     "pip": "markitdown[pdf]==0.1.8",     "shards": 1},
+  {"name": "pymupdf4llm",         "tool": "pymupdf4llm",  "mode": "default",     "pip": "pymupdf4llm==1.28.2",        "shards": 1},
+  {"name": "liteparse",           "tool": "liteparse",    "mode": "default",     "pip": "liteparse==2.15.1",          "shards": 1, "apt": "tesseract-ocr"},
+  {"name": "liteparse-no-ocr",    "tool": "liteparse",    "mode": "no-ocr",      "pip": "liteparse==2.15.1",          "shards": 1},
+  {"name": "marker-fast-no-ocr",  "tool": "marker",       "mode": "fast-no-ocr", "pip": "marker-pdf==2.0.0",          "shards": 2},
+  {"name": "marker-fast",         "tool": "marker",       "mode": "fast",        "pip": "marker-pdf==2.0.0",          "shards": 4},
+  {"name": "docling",             "tool": "docling",      "mode": "default",     "pip": "docling==2.134.0",           "shards": 4},
+  {"name": "mineru-basic",        "tool": "mineru",       "mode": "basic",       "pip": "mineru==4.0.10",             "shards": 4},
+  {"name": "unstructured-hi-res", "tool": "unstructured", "mode": "default",     "pip": "unstructured[pdf]==0.27.16", "shards": 4, "apt": "tesseract-ocr poppler-utils"}
+]

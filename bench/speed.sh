@@ -20,8 +20,8 @@ import json, sys
 only = {s for s in sys.argv[1].split(',') if s}
 for c in json.load(open('$here/candidates.json')):
     if not only or c['name'] in only:
-        print(c['name'], c['tool'], c['mode'], c['pip'], sep='\t')
-" "$only" | while IFS=$'\t' read -r name tool mode pip; do
+        print(c['name'], c['tool'], c['mode'], c['pip'], c.get('setup') or '-', sep='\t')
+" "$only" | while IFS=$'\t' read -r name tool mode pip setup; do
   echo "::group::$name ($pip)"
   venv=$RUNNER_TEMP/speed-venv
   cache=$RUNNER_TEMP/speed-cache
@@ -37,6 +37,11 @@ for c in json.load(open('$here/candidates.json')):
     continue
   fi
   install_mb=$(du -sm "$venv" | cut -f1)
+  unset LLAMA_CPP_BINARY
+  if [ "$setup" = llamacpp ]; then
+    export LLAMA_CPP_BINARY=$(bash "$here/install-llamacpp.sh" "$RUNNER_TEMP/llamacpp")
+    install_mb=$((install_mb + $(du -sm "$RUNNER_TEMP/llamacpp" | cut -f1)))
+  fi
   "$venv/bin/pip" install --quiet psutil pypdf
   "$venv/bin/pip" freeze > "$out/$name.shard0.freeze.txt"
   home_before=$(du -sm --exclude=work "$HOME" | cut -f1)
@@ -57,7 +62,7 @@ json.dump({
     "mem_gb": round(os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 2**30, 1),
 }, open(sys.argv[1], "w"), indent=2)
 EOF
-  rm -rf "$venv" "$cache" "$RUNNER_TEMP/warmup" "$out/$name"
+  rm -rf "$venv" "$cache" "$RUNNER_TEMP/warmup" "$RUNNER_TEMP/llamacpp" "$out/$name"
   "$(command -v pip)" cache purge > /dev/null 2>&1 || true
   echo "::endgroup::"
 done

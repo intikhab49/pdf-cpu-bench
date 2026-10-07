@@ -65,8 +65,15 @@ def docling(mode):
 
 
 def mineru(mode):
-    # MinerU 4's stateless CLI; tier "basic" is its ONNX, CPU-capable tier
-    tier = mode if mode != "default" else "basic"
+    # tier "basic" is MinerU 4's ONNX, CPU-capable tier. Default: the in-process Python API, so
+    # models stay loaded across pages like every other tool here. "<tier>-cli" runs the stateless
+    # CLI per page instead (reloads models every page).
+    tier = mode.removesuffix("-cli") if mode != "default" else "basic"
+    if not mode.endswith("-cli"):
+        from mineru.parser import parse
+
+        return lambda path: parse(path, tier=tier).markdown()
+
     # the CLI lives in the tool's own venv, which is not on PATH
     venv_bin = pathlib.Path(sys.executable).parent
     exe = shutil.which("mineru-kit", path=str(venv_bin))
@@ -96,12 +103,13 @@ def unstructured(mode):
         parts = []
         for el in elements:
             html = getattr(el.metadata, "text_as_html", None)
+            text = el.text or ""  # some elements (images, page breaks) carry no text
             if el.category == "Table" and html:
                 parts.append(html)
-            elif el.category == "Title":
-                parts.append("# " + el.text)
-            else:
-                parts.append(el.text)
+            elif el.category == "Title" and text:
+                parts.append("# " + text)
+            elif text:
+                parts.append(text)
         return "\n\n".join(parts)
 
     return convert

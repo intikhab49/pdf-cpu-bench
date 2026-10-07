@@ -41,7 +41,8 @@ jobs:
               if only and c["name"] not in only:
                   continue
               shards = c["shards"] if full else 1
-              rows += [dict(c, shard=i, shards=shards, apt=c.get("apt", "")) for i in range(shards)]
+              rows += [dict(c, shard=i, shards=shards, apt=c.get("apt", ""), setup=c.get("setup", ""))
+                       for i in range(shards)]
           print("matrix=" + json.dumps({"include": rows}))
           EOF
 
@@ -87,6 +88,8 @@ jobs:
           df -h /
       - if: matrix.apt != ''
         run: sudo apt-get update -q && sudo apt-get install -y -q ${{ matrix.apt }}
+      - if: matrix.setup == 'llamacpp'
+        run: echo "LLAMA_CPP_BINARY=$(bash bench/install-llamacpp.sh "$RUNNER_TEMP/llamacpp")" >> "$GITHUB_ENV"
       - name: Install ${{ matrix.pip }}
         run: |
           python -m venv "$RUNNER_TEMP/venv"

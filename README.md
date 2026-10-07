@@ -94,4 +94,6 @@ gh workflow run rescore.yml -f run_id=<bench run id>   # re-score saved outputs 
 
 Candidates and pinned versions live in [`bench/candidates.json`](bench/candidates.json). Charts and header regenerate from `results/results.json` with `python docs/make_charts.py` and `python docs/make_header.py`.
 
+Code in this repo is [MIT](LICENSE). The benchmark PDFs and tests are not redistributed here: they are Ai2's [olmOCR-bench](https://huggingface.co/datasets/allenai/olmOCR-bench) (ODC-BY-1.0), downloaded at a pinned revision when the workflow runs.
+
 Results here come from bench run [37594785474](https://github.com/intikhab49/pdf-cpu-bench/actions/runs/37594785474) and rescore runs [37643034123](https://github.com/intikhab49/pdf-cpu-bench/actions/runs/37643034123) / [37649802042](https://github.com/intikhab49/pdf-cpu-bench/actions/runs/37649802042).

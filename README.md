@@ -23,17 +23,17 @@ Quality on all 1,403 PDFs (8,413 tests, the official olmocr-bench checker). Spee
 
 | Parser (default settings) | Version | Score | Seconds / page | Peak RAM | Install + models | License |
 |---|---|---:|---:|---:|---:|---|
-| **MinerU**, `tier="basic"` (ONNX, CPU) | 4.0.10 | **74.6 ± 1.0** | 6.2 | 4.6 GB | 1.8 GB | Apache-2.0 + [terms](https://github.com/opendatalab/MinerU/blob/master/LICENSE.md)¹ |
-| marker, `fast` | 2.0.0 | 58.3 ± 1.1 | 24.2 | **12.3 GB** | 7.7 GB | code Apache-2.0, weights OpenRAIL-M² |
-| docling | 2.134.0 | 53.4 ± 0.9 | 4.3 | 4.7 GB | 6.6 GB | MIT |
-| marker, `fast` + `disable_ocr` | 2.0.0 | 43.7 ± 0.9 | 0.65 | 2.4 GB | 6.1 GB | code Apache-2.0, weights OpenRAIL-M² |
-| liteparse | 2.15.1 | 40.6 ± 1.0 | 0.61 | 0.36 GB | 0.06 GB | Apache-2.0 |
-| liteparse, `ocr_enabled=False` | 2.15.1 | 39.1 ± 0.9 | 0.007 | 0.06 GB | 0.05 GB | Apache-2.0 |
-| unstructured, `hi_res` | 0.27.16 | 38.0 ± 1.0 | 7.5 | 4.5 GB | 7.0 GB | Apache-2.0 |
-| pymupdf4llm | 1.28.2 | 37.5 ± 1.0 | 0.85 | 0.41 GB | 0.29 GB | AGPL-3.0 |
-| markitdown `[pdf]` | 0.1.8 | 29.3 ± 0.9 | 0.18 | 0.13 GB | 0.25 GB | MIT |
+| **MinerU**, `tier="basic"` (ONNX, CPU) | 4.0.10 | **74.6&nbsp;±&nbsp;1.0** | 6.2 | 4.6&nbsp;GB | 1.8&nbsp;GB | Apache-2.0 + [terms](https://github.com/opendatalab/MinerU/blob/master/LICENSE.md)¹ |
+| marker, `fast` | 2.0.0 | 58.3&nbsp;±&nbsp;1.1 | 24.2 | **12.3&nbsp;GB** | 7.7&nbsp;GB | Apache-2.0, weights² |
+| docling | 2.134.0 | 53.4&nbsp;±&nbsp;0.9 | 4.3 | 4.7&nbsp;GB | 6.6&nbsp;GB | MIT |
+| marker, `fast` + `disable_ocr` | 2.0.0 | 43.7&nbsp;±&nbsp;0.9 | 0.65 | 2.4&nbsp;GB | 6.1&nbsp;GB | Apache-2.0, weights² |
+| liteparse | 2.15.1 | 40.6&nbsp;±&nbsp;1.0 | 0.61 | 0.36&nbsp;GB | 0.06&nbsp;GB | Apache-2.0 |
+| liteparse, `ocr_enabled=False` | 2.15.1 | 39.1&nbsp;±&nbsp;0.9 | 0.007 | 0.06&nbsp;GB | 0.05&nbsp;GB | Apache-2.0 |
+| unstructured, `hi_res` | 0.27.16 | 38.0&nbsp;±&nbsp;1.0 | 7.5 | 4.5&nbsp;GB | 7.0&nbsp;GB | Apache-2.0 |
+| pymupdf4llm | 1.28.2 | 37.5&nbsp;±&nbsp;1.0 | 0.85 | 0.41&nbsp;GB | 0.29&nbsp;GB | AGPL-3.0 |
+| markitdown `[pdf]` | 0.1.8 | 29.3&nbsp;±&nbsp;0.9 | 0.18 | 0.13&nbsp;GB | 0.25&nbsp;GB | MIT |
 
-<sub>¹ Free commercial use below 100M monthly users or USD 20M monthly revenue; online services must say they use MinerU. ² Free for research, personal use and organisations under USD 5M funding/revenue. Score = macro-average of the 8 categories, ±95% CI from the checker's bootstrap. GB = 1024³ bytes. Raw numbers: [`results/results.json`](results/results.json), per-tool checker output: [`results/scores/`](results/scores).</sub>
+<sub>¹ Free commercial use below 100M monthly users or USD 20M monthly revenue; online services must say they use MinerU. ² Model weights under a modified OpenRAIL-M: free for research, personal use and organisations under USD 5M funding/revenue. Score = macro-average of the 8 categories, ±95% CI from the checker's bootstrap. GB = 1024³ bytes. Raw numbers: [`results/results.json`](results/results.json), per-tool checker output: [`results/scores/`](results/scores).</sub>
 
 **What stands out**
 

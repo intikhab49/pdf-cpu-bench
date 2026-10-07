@@ -70,7 +70,8 @@ def main():
     for path in sorted(out.glob("score-*.txt")):
         name = path.stem.removeprefix("score-")
         text = path.read_text(errors="replace")
-        m = re.search(r"Average Score:\s*([\d.]+)%\D+([\d.]+)%", text)
+        # the "x% ± y%" summary line, not the "x% (95% CI: ...)" one above it
+        m = re.search(r"Average Score:\s*([\d.]+)%[^\d(]+([\d.]+)%", text)
         cats = dict(re.findall(r"^\s+(\w+?)(?:\.jsonl)?\s+:\s+([\d.]+)% \(", text, re.M))
         scores[name] = {"score": float(m.group(1)) if m else None, "ci95": float(m.group(2)) if m else None,
                         "categories": {k: float(v) for k, v in cats.items()}}

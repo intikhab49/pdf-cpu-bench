@@ -8,6 +8,9 @@ on:
       run_id:
         description: bench run whose out-* and speed artifacts to score
         required: true
+      only:
+        description: comma-separated candidates to score, empty = all
+        default: ""
 
 permissions:
   contents: read
@@ -50,7 +53,7 @@ jobs:
       - name: Score
         run: |
           python bench/prepare_scoring.py --data olmOCR-bench/bench_data --out out
-          bash bench/score.sh olmOCR-bench/bench_data out
+          bash bench/score.sh olmOCR-bench/bench_data out "${{ inputs.only }}"
       - name: Summarize
         if: always()
         run: |

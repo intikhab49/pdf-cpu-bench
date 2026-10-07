@@ -1,0 +1,18 @@
+Final Summary with 95% Confidence Intervals:
+unstructured-hi-res  : Average Score: 38.0% ± 1.0% (average of per-JSONL scores)
+    absent  : 32.0% average pass rate over 823 tests
+    baseline: 97.8% average pass rate over 1403 tests
+    math    : 0.0% average pass rate over 3385 tests
+    order   : 47.6% average pass rate over 1061 tests
+    present : 42.3% average pass rate over 721 tests
+    table   : 41.4% average pass rate over 1020 tests
+
+    Results by JSONL file:
+        arxiv_math.jsonl              : 0.0% (0/2927 tests)
+        baseline                      : 97.8% (1363/1394 tests)
+        headers_footers.jsonl         : 28.2% (214/760 tests)
+        long_tiny_text.jsonl          : 60.6% (268/442 tests)
+        multi_column.jsonl            : 55.3% (489/884 tests)
+        old_scans.jsonl               : 20.7% (109/526 tests)
+        old_scans_math.jsonl          : 0.0% (0/458 tests)
+        table_tests.jsonl             : 41.5% (424/1022 tests)

@@ -1,0 +1,304 @@
+{
+  "quality_run": {
+    "docling": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 9V45 96-Core Processor",
+        "INTEL(R) XEON(R) PLATINUM 8573C",
+        "Intel(R) Xeon(R) 6973P-C"
+      ]
+    },
+    "liteparse": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 7763 64-Core Processor"
+      ]
+    },
+    "liteparse-no-ocr": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"
+      ]
+    },
+    "marker-fast": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 130,
+      "cpus": [
+        "AMD EPYC 7763 64-Core Processor",
+        "AMD EPYC 9V45 96-Core Processor",
+        "AMD EPYC 9V74 80-Core Processor"
+      ]
+    },
+    "marker-fast-no-ocr": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 7763 64-Core Processor"
+      ]
+    },
+    "markitdown": {
+      "pages": 1403,
+      "errors": 7,
+      "timeouts": 0,
+      "cpus": [
+        "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz"
+      ]
+    },
+    "mineru-basic": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 7763 64-Core Processor",
+        "AMD EPYC 9V45 96-Core Processor",
+        "INTEL(R) XEON(R) PLATINUM 8573C"
+      ]
+    },
+    "pymupdf4llm": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 9V45 96-Core Processor"
+      ]
+    },
+    "unstructured-hi-res": {
+      "pages": 1403,
+      "errors": 0,
+      "timeouts": 0,
+      "cpus": [
+        "AMD EPYC 7763 64-Core Processor",
+        "AMD EPYC 9V74 80-Core Processor",
+        "INTEL(R) XEON(R) PLATINUM 8573C"
+      ]
+    }
+  },
+  "speed": {
+    "docling": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 4.281,
+      "pages_per_s": 0.14,
+      "load_s": 5.29,
+      "peak_rss_mb": 4767,
+      "install_mb": 6303,
+      "downloads_mb": 506
+    },
+    "liteparse": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 0.61,
+      "pages_per_s": 0.74,
+      "load_s": 0.02,
+      "peak_rss_mb": 372,
+      "install_mb": 47,
+      "downloads_mb": 15
+    },
+    "liteparse-no-ocr": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 0.007,
+      "pages_per_s": 149.09,
+      "load_s": 0.02,
+      "peak_rss_mb": 65,
+      "install_mb": 47,
+      "downloads_mb": 1
+    },
+    "marker-fast": {
+      "pages": 70,
+      "failed": 14,
+      "median_s": 24.161,
+      "pages_per_s": 0.01,
+      "load_s": 7.34,
+      "peak_rss_mb": 12624,
+      "install_mb": 6204,
+      "downloads_mb": 1667
+    },
+    "marker-fast-no-ocr": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 0.649,
+      "pages_per_s": 1.08,
+      "load_s": 7.89,
+      "peak_rss_mb": 2432,
+      "install_mb": 6160,
+      "downloads_mb": 136
+    },
+    "markitdown": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 0.183,
+      "pages_per_s": 4.88,
+      "load_s": 0.36,
+      "peak_rss_mb": 129,
+      "install_mb": 251,
+      "downloads_mb": 1
+    },
+    "mineru-basic": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 6.17,
+      "pages_per_s": 0.14,
+      "load_s": 0.38,
+      "peak_rss_mb": 4678,
+      "install_mb": 1003,
+      "downloads_mb": 820
+    },
+    "pymupdf4llm": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 0.846,
+      "pages_per_s": 0.57,
+      "load_s": 0.59,
+      "peak_rss_mb": 422,
+      "install_mb": 292,
+      "downloads_mb": 2
+    },
+    "unstructured-hi-res": {
+      "pages": 70,
+      "failed": 0,
+      "median_s": 7.471,
+      "pages_per_s": 0.12,
+      "load_s": 4.75,
+      "peak_rss_mb": 4616,
+      "install_mb": 6856,
+      "downloads_mb": 318
+    }
+  },
+  "scores": {
+    "docling": {
+      "score": 53.4,
+      "ci95": 0.9,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 99.1,
+        "headers_footers": 89.7,
+        "long_tiny_text": 68.6,
+        "multi_column": 73.8,
+        "old_scans": 25.1,
+        "old_scans_math": 0.0,
+        "table_tests": 70.9
+      }
+    },
+    "liteparse-no-ocr": {
+      "score": 39.1,
+      "ci95": 0.9,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 99.9,
+        "headers_footers": 55.7,
+        "long_tiny_text": 23.8,
+        "multi_column": 65.5,
+        "old_scans": 13.3,
+        "old_scans_math": 0.0,
+        "table_tests": 54.8
+      }
+    },
+    "liteparse": {
+      "score": 40.6,
+      "ci95": 1.0,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 99.9,
+        "headers_footers": 51.2,
+        "long_tiny_text": 37.3,
+        "multi_column": 65.8,
+        "old_scans": 13.9,
+        "old_scans_math": 0.0,
+        "table_tests": 56.3
+      }
+    },
+    "marker-fast-no-ocr": {
+      "score": 43.7,
+      "ci95": 0.9,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 88.1,
+        "headers_footers": 95.4,
+        "long_tiny_text": 40.5,
+        "multi_column": 67.1,
+        "old_scans": 13.3,
+        "old_scans_math": 0.0,
+        "table_tests": 45.5
+      }
+    },
+    "marker-fast": {
+      "score": 58.3,
+      "ci95": 1.1,
+      "categories": {
+        "arxiv_math": 20.2,
+        "baseline": 90.7,
+        "headers_footers": 93.9,
+        "long_tiny_text": 43.0,
+        "multi_column": 59.6,
+        "old_scans": 31.7,
+        "old_scans_math": 66.6,
+        "table_tests": 61.0
+      }
+    },
+    "markitdown": {
+      "score": 29.3,
+      "ci95": 0.9,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 86.8,
+        "headers_footers": 38.8,
+        "long_tiny_text": 31.2,
+        "multi_column": 39.3,
+        "old_scans": 13.3,
+        "old_scans_math": 0.0,
+        "table_tests": 25.0
+      }
+    },
+    "mineru-basic": {
+      "score": 74.6,
+      "ci95": 1.0,
+      "categories": {
+        "arxiv_math": 76.9,
+        "baseline": 97.6,
+        "headers_footers": 96.2,
+        "long_tiny_text": 86.4,
+        "multi_column": 76.9,
+        "old_scans": 27.4,
+        "old_scans_math": 63.1,
+        "table_tests": 72.7
+      }
+    },
+    "pymupdf4llm": {
+      "score": 37.5,
+      "ci95": 1.0,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 87.2,
+        "headers_footers": 38.0,
+        "long_tiny_text": 33.7,
+        "multi_column": 66.6,
+        "old_scans": 13.3,
+        "old_scans_math": 0.0,
+        "table_tests": 61.2
+      }
+    },
+    "unstructured-hi-res": {
+      "score": 38.0,
+      "ci95": 1.0,
+      "categories": {
+        "arxiv_math": 0.0,
+        "baseline": 97.8,
+        "headers_footers": 28.2,
+        "long_tiny_text": 60.6,
+        "multi_column": 55.3,
+        "old_scans": 20.7,
+        "old_scans_math": 0.0,
+        "table_tests": 41.5
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+Final Summary with 95% Confidence Intervals:
+liteparse            : Average Score: 40.6% ± 1.0% (average of per-JSONL scores)
+    absent  : 52.6% average pass rate over 823 tests
+    baseline: 99.9% average pass rate over 1403 tests
+    math    : 0.0% average pass rate over 3385 tests
+    order   : 55.2% average pass rate over 1061 tests
+    present : 25.4% average pass rate over 721 tests
+    table   : 56.2% average pass rate over 1020 tests
+
+    Results by JSONL file:
+        arxiv_math.jsonl              : 0.0% (0/2927 tests)
+        baseline                      : 99.9% (1393/1394 tests)
+        headers_footers.jsonl         : 51.2% (389/760 tests)
+        long_tiny_text.jsonl          : 37.3% (165/442 tests)
+        multi_column.jsonl            : 65.8% (582/884 tests)
+        old_scans.jsonl               : 13.9% (73/526 tests)
+        old_scans_math.jsonl          : 0.0% (0/458 tests)
+        table_tests.jsonl             : 56.3% (575/1022 tests)

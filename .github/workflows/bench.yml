@@ -194,9 +194,12 @@ jobs:
       - name: Score
         run: |
           python bench/prepare_scoring.py --data olmOCR-bench/bench_data --out out
-          python -m olmocr.bench.benchmark --dir olmOCR-bench/bench_data 2>&1 | tee out/olmocr-bench-score.txt
+          bash bench/score.sh olmOCR-bench/bench_data out
       - name: Summarize
-        run: python bench/summarize.py --out out --speed speed | tee -a "$GITHUB_STEP_SUMMARY"
+        if: always()
+        run: |
+          set -o pipefail
+          python bench/summarize.py --out out --speed speed | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: results

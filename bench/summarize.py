@@ -8,6 +8,7 @@ import argparse
 import collections
 import json
 import pathlib
+import re
 import statistics
 
 
@@ -64,10 +65,26 @@ def main():
         results["speed"][name] = row
         report.append("| {} | {pages} | {failed} | {median_s} | {pages_per_s} | {load_s} | {peak_rss_mb} | {install_mb} | {downloads_mb} |".format(name, **row))
 
-    score_path = out / "olmocr-bench-score.txt"
-    score_text = score_path.read_text() if score_path.exists() else "(no score output)"
-    tail = score_text[score_text.find("Final Summary"):] if "Final Summary" in score_text else score_text[-6000:]
-    report += ["", "## olmocr-bench (official checker output)", "", "```", tail.strip(), "```"]
+    # olmocr-bench scores, one file per candidate from bench/score.sh
+    scores = {}
+    for path in sorted(out.glob("score-*.txt")):
+        name = path.stem.removeprefix("score-")
+        text = path.read_text(errors="replace")
+        m = re.search(r"Average Score:\s*([\d.]+)%\D+([\d.]+)%", text)
+        cats = dict(re.findall(r"^\s+(\w+?)(?:\.jsonl)?\s+:\s+([\d.]+)% \(", text, re.M))
+        scores[name] = {"score": float(m.group(1)) if m else None, "ci95": float(m.group(2)) if m else None,
+                        "categories": {k: float(v) for k, v in cats.items()}}
+    results["scores"] = scores
+    cat_names = ["arxiv_math", "old_scans_math", "table_tests", "old_scans", "headers_footers",
+                 "multi_column", "long_tiny_text", "baseline"]
+    report += ["", "## olmocr-bench score (official checker, macro-average of categories)", "",
+               "| Candidate | Score | ±95% | " + " | ".join(cat_names) + " |",
+               "|---|---:|---:|" + "---:|" * len(cat_names)]
+    for name, s in sorted(scores.items(), key=lambda kv: -(kv[1]["score"] or -1)):
+        cells = [f"{s['categories'].get(c, float('nan')):.1f}" for c in cat_names]
+        score = "not scored" if s["score"] is None else f"{s['score']:.1f}"
+        ci = "" if s["ci95"] is None else f"{s['ci95']:.1f}"
+        report.append(f"| {name} | {score} | {ci} | " + " | ".join(cells) + " |")
 
     (out / "results.md").write_text("\n".join(report) + "\n")
     (out / "results.json").write_text(json.dumps(results, indent=2))
